@@ -31,28 +31,30 @@
 //   }
 // }
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<NextResponse> {
+type Context = {
+  params: {
+    id: string;
+  };
+};
+
+export async function PATCH(req: NextRequest, { params }: Context) {
   try {
     const { estado } = await req.json();
-    const id = params.id;
 
     const pedidoActualizado = await prisma.pedido.update({
       where: {
-        id: parseInt(id),
+        id: parseInt(params.id),
       },
       data: { estado },
     });
 
-    return NextResponse.json(pedidoActualizado);
+    return Response.json(pedidoActualizado);
   } catch (error) {
     console.error("Error al actualizar el pedido:", error);
-    return NextResponse.json(
+    return Response.json(
       { error: "Error al actualizar el pedido" },
       { status: 500 }
     );
