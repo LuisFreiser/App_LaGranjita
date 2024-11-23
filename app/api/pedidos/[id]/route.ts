@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// const Prisma = new prisma();
+type Props = {
+  params: {
+    id: string;
+  };
+};
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
-
+export async function PATCH(request: NextRequest, context: Props) {
   try {
     const { estado } = await request.json();
+    const { id } = context.params;
 
     // Actualizar el estado del pedido
     const pedidoActualizado = await prisma.pedido.update({
