@@ -230,7 +230,7 @@ export default function Dashboard() {
                     pedido // Aquí estás usando pedidosPaginados
                   ) => (
                     <TableRow key={pedido.id}>
-                      <TableCell>{`#${pedido.id}`}</TableCell>
+                      <TableCell>{pedido.id}</TableCell>
                       <TableCell>{pedido.cliente}</TableCell>
                       <TableCell>{pedido.producto}</TableCell>
                       <TableCell>{pedido.cantidad}</TableCell>
