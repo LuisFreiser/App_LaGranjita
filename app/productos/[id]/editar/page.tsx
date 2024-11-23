@@ -20,6 +20,7 @@ export default function EditarProducto() {
   const [nombre, setNombre] = useState("");
   const [cantidad, setCantidad] = useState(0);
   const [unidad, setUnidad] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [ultimaActualizacion, setUltimaActualizacion] = useState("");
 
   useEffect(() => {
