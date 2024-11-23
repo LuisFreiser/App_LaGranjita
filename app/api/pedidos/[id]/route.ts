@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+// const Prisma = new prisma();
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: number } }
+  { params }: { params: { id: string } }
 ) {
   const { id } = params;
 
@@ -14,7 +14,7 @@ export async function PATCH(
 
     // Actualizar el estado del pedido
     const pedidoActualizado = await prisma.pedido.update({
-      where: { id: Number(id) },
+      where: { id: parseInt(id) },
       data: { estado },
     });
 
@@ -25,5 +25,8 @@ export async function PATCH(
       { error: "Error al actualizar el pedido" },
       { status: 500 }
     );
+  } finally {
+    // Es buena práctica desconectar el cliente de Prisma
+    await prisma.$disconnect();
   }
 }
