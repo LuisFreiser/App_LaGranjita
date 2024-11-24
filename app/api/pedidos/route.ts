@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/db";
 
-const prisma = new PrismaClient();
-
+// POST para crear un nuevo pedido
 export async function POST(request: NextRequest) {
   try {
     const {
@@ -71,6 +70,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// GET para obtener todos los pedidos
 export async function GET() {
   try {
     const pedidos = await prisma.pedido.findMany();
@@ -84,6 +84,7 @@ export async function GET() {
   }
 }
 
+// PUT para actualizar un pedido
 export async function PUT(request: NextRequest) {
   try {
     const { id, cliente, producto, cantidad, precioUnitario, estado } =
@@ -114,6 +115,7 @@ export async function PUT(request: NextRequest) {
   }
 }
 
+// DELETE para eliminar un pedido
 export async function DELETE(request: NextRequest) {
   try {
     const { id } = await request.json();

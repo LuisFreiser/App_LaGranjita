@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/db";
 
-// const Prisma = new prisma();
-
+//PATCH sirve para actualizar solo algunos campos de la tabla pedido
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }

@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/db";
 
-const prisma = new PrismaClient();
-
+// DELETE para eliminar un producto
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
@@ -22,7 +21,7 @@ export async function DELETE(
     );
   }
 }
-
+// PUT para actualizar todos los campos de la tabla producto
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
