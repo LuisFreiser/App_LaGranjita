@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { DollarSign } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 type Pedido = {
   id: number;
@@ -157,8 +158,7 @@ export default function Dashboard() {
   return (
     <div className="container mx-auto p-4">
       {/* Cabecera */}
-      <h1 className="text-3xl font-bold mb-4">La Granjita</h1>
-      <h2 className="text-xl font-bold mb-6">Dashboard</h2>
+      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
 
       {/* Sección de métricas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -209,7 +209,10 @@ export default function Dashboard() {
       <div className="container mt-4 mx-auto p-4 rounded-lg shadow-lg bg-white dark:bg-slate-900 dark:shadow-slate-700">
         <h2 className="text-xl font-semibold mb-4">Pedidos Pendientes</h2>
         {loading ? (
-          <p>Cargando pedidos...</p>
+          <div className="flex h-full">
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            <p>Cargando pedidos...</p>
+          </div>
         ) : pedidos.filter((pedido) => pedido.estado === "Pendiente").length >
           0 ? (
           <>

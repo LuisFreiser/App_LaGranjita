@@ -29,6 +29,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export default function PedidosPage() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -155,7 +156,13 @@ export default function PedidosPage() {
     fetchPedidos();
   }, []);
 
-  if (loading) return <div>Cargando Pedidos...</div>;
+  if (loading)
+    return (
+      <div className="fixed inset-0 z-50 flex justify-center items-center h-full">
+        <Loader2 className="mr-2 h-12 w-12 animate-spin" />
+        <p>Cargando Pedidos...</p>
+      </div>
+    );
 
   return (
     <div className="container mx-auto p-4 rounded-lg shadow-lg bg-white dark:bg-slate-900 dark:shadow-slate-700">
@@ -233,11 +240,11 @@ export default function PedidosPage() {
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Seleccionar Pendiente" />
+                <SelectValue placeholder="Seleccionar Estado" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Pendiente">Pendiente</SelectItem>
-                <SelectItem value="Entregado ">Entregado</SelectItem>
+                <SelectItem value="Entregado">Entregado</SelectItem>
               </SelectContent>
             </Select>
             <DialogClose asChild>
@@ -247,112 +254,224 @@ export default function PedidosPage() {
         </DialogContent>
       </Dialog>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Cliente</TableHead>
-            <TableHead>Producto</TableHead>
-            <TableHead>Cantidad</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead>Total S/</TableHead>
-            <TableHead>Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {pedidos.map((pedido) => (
-            <TableRow key={pedido.id}>
-              <TableCell>{pedido.id}</TableCell>
-              <TableCell>{pedido.cliente}</TableCell>
-              <TableCell>{pedido.producto}</TableCell>
-              <TableCell>{pedido.cantidad}</TableCell>
-              <TableCell>{pedido.estado}</TableCell>
-              <TableCell>{pedido.precioTotal}</TableCell>
-              <TableCell>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      onClick={() => setEditPedido(pedido)}
-                    >
-                      Editar
-                    </Button>
-                  </DialogTrigger>
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleEliminarPedido(pedido.id)}
-                    className="ml-2"
-                  >
-                    Eliminar
-                  </Button>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Editar Pedido</DialogTitle>
-                    </DialogHeader>
-                    {editPedido && (
-                      <div className="grid gap-4">
-                        <Input
-                          placeholder="Cliente"
-                          value={editPedido.cliente || ""}
-                          onChange={(e) =>
-                            setEditPedido({
-                              ...editPedido,
-                              cliente: e.target.value,
-                            })
-                          }
-                        />
-                        <Input
-                          placeholder="Producto"
-                          value={editPedido.producto || ""}
-                          onChange={(e) =>
-                            setEditPedido({
-                              ...editPedido,
-                              producto: e.target.value,
-                            })
-                          }
-                        />
-                        <Input
-                          type="number"
-                          placeholder="Cantidad"
-                          value={editPedido.cantidad || ""}
-                          onChange={(e) =>
-                            setEditPedido({
-                              ...editPedido,
-                              cantidad: Number(e.target.value),
-                            })
-                          }
-                        />
-                        <Select
-                          value={editPedido?.estado || "Pendiente"}
-                          onValueChange={(value) =>
-                            setEditPedido({
-                              ...editPedido,
-                              estado: value,
-                            })
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleccionar Estado" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Pendiente">Pendiente</SelectItem>
-                            <SelectItem value="Entregado">Entregado</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <DialogClose asChild>
-                          <Button onClick={handleEditarPedido}>
-                            Guardar Cambios
-                          </Button>
-                        </DialogClose>
-                      </div>
-                    )}
-                  </DialogContent>
-                </Dialog>
-              </TableCell>
+      {/* Tabla en pantallas grandes */}
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Cliente</TableHead>
+              <TableHead>Producto</TableHead>
+              <TableHead>Cantidad</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Total S/</TableHead>
+              <TableHead>Acciones</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {pedidos.map((pedido) => (
+              <TableRow key={pedido.id}>
+                <TableCell>{pedido.id}</TableCell>
+                <TableCell>{pedido.cliente}</TableCell>
+                <TableCell>{pedido.producto}</TableCell>
+                <TableCell>{pedido.cantidad}</TableCell>
+                <TableCell>{pedido.estado}</TableCell>
+                <TableCell>{pedido.precioTotal}</TableCell>
+                <TableCell className="flex items-center gap-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        onClick={() => setEditPedido(pedido)}
+                      >
+                        Editar
+                      </Button>
+                    </DialogTrigger>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleEliminarPedido(pedido.id)}
+                    >
+                      Eliminar
+                    </Button>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Editar Pedido</DialogTitle>
+                      </DialogHeader>
+                      {editPedido && (
+                        <div className="grid gap-4">
+                          <Input
+                            placeholder="Cliente"
+                            value={editPedido.cliente || ""}
+                            onChange={(e) =>
+                              setEditPedido({
+                                ...editPedido,
+                                cliente: e.target.value,
+                              })
+                            }
+                          />
+                          <Input
+                            placeholder="Producto"
+                            value={editPedido.producto || ""}
+                            onChange={(e) =>
+                              setEditPedido({
+                                ...editPedido,
+                                producto: e.target.value,
+                              })
+                            }
+                          />
+                          <Input
+                            type="number"
+                            placeholder="Cantidad"
+                            value={editPedido.cantidad || ""}
+                            onChange={(e) =>
+                              setEditPedido({
+                                ...editPedido,
+                                cantidad: Number(e.target.value),
+                              })
+                            }
+                          />
+                          <Select
+                            value={editPedido?.estado || "Pendiente"}
+                            onValueChange={(value) =>
+                              setEditPedido({
+                                ...editPedido,
+                                estado: value,
+                              })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Seleccionar Estado" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Pendiente">
+                                Pendiente
+                              </SelectItem>
+                              <SelectItem value="Entregado">
+                                Entregado
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <DialogClose asChild>
+                            <Button onClick={handleEditarPedido}>
+                              Guardar Cambios
+                            </Button>
+                          </DialogClose>
+                        </div>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Tarjetas en pantallas pequeñas */}
+      <div className="md:hidden grid gap-4">
+        {pedidos.map((pedido) => (
+          <div
+            key={pedido.id}
+            className="p-4 border rounded-lg bg-white shadow dark:bg-slate-800"
+          >
+            <h2 className="text-lg font-semibold mb-2">
+              Pedido #{pedido.id} - {pedido.cliente}
+            </h2>
+            <p>
+              <strong>Producto:</strong> {pedido.producto}
+            </p>
+            <p>
+              <strong>Cantidad:</strong> {pedido.cantidad}
+            </p>
+            <p>
+              <strong>Estado:</strong> {pedido.estado}
+            </p>
+            <p>
+              <strong>Total:</strong> S/ {pedido.precioTotal}
+            </p>
+            <div className="mt-2 flex items-center gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    onClick={() => setEditPedido(pedido)}
+                  >
+                    Editar
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Editar Pedido</DialogTitle>
+                  </DialogHeader>
+                  {editPedido && (
+                    <div className="grid gap-4">
+                      <Input
+                        placeholder="Cliente"
+                        value={editPedido.cliente || ""}
+                        onChange={(e) =>
+                          setEditPedido({
+                            ...editPedido,
+                            cliente: e.target.value,
+                          })
+                        }
+                      />
+                      <Input
+                        placeholder="Producto"
+                        value={editPedido.producto || ""}
+                        onChange={(e) =>
+                          setEditPedido({
+                            ...editPedido,
+                            producto: e.target.value,
+                          })
+                        }
+                      />
+                      <Input
+                        type="number"
+                        placeholder="Cantidad"
+                        value={editPedido.cantidad || ""}
+                        onChange={(e) =>
+                          setEditPedido({
+                            ...editPedido,
+                            cantidad: Number(e.target.value),
+                          })
+                        }
+                      />
+                      <Select
+                        value={editPedido?.estado || "Pendiente"}
+                        onValueChange={(value) =>
+                          setEditPedido({
+                            ...editPedido,
+                            estado: value,
+                          })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar Estado" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Pendiente">Pendiente</SelectItem>
+                          <SelectItem value="Entregado">Entregado</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <DialogClose asChild>
+                        <Button onClick={handleEditarPedido}>
+                          Guardar Cambios
+                        </Button>
+                      </DialogClose>
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="destructive"
+                onClick={() => handleEliminarPedido(pedido.id)}
+              >
+                Eliminar
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

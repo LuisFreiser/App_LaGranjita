@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 type Producto = {
   id: number;
@@ -127,7 +128,14 @@ export default function ProductosPage() {
     }
   };
 
-  if (loading) return <p>Cargando productos...</p>;
+  // <p>Cargando productos...</p>;
+  if (loading)
+    return (
+      <div className="fixed inset-0 z-50 flex justify-center items-center h-full">
+        <Loader2 className="mr-2 h-12 w-12 animate-spin" />
+        <p>Cargando Productos...</p>
+      </div>
+    );
 
   return (
     <div className="container mx-auto p-4 rounded-lg shadow-lg bg-white dark:bg-slate-900 dark:shadow-slate-700">
@@ -179,95 +187,186 @@ export default function ProductosPage() {
         </DialogContent>
       </Dialog>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Stock</TableHead>
-            <TableHead>Unidad</TableHead>
-            <TableHead>Última Actualización</TableHead>
-            <TableHead>Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {productos.map((producto) => (
-            <TableRow key={producto.id}>
-              <TableCell>{producto.id}</TableCell>
-              <TableCell>{producto.nombre}</TableCell>
-              <TableCell>{producto.cantidad}</TableCell>
-              <TableCell>{producto.unidad}</TableCell>
-              <TableCell>
-                {new Date(producto.ultimaActualizacion).toLocaleDateString()}
-              </TableCell>
-              <TableCell>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      onClick={() => setEditProducto(producto)}
-                    >
-                      Editar
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Editar Producto</DialogTitle>
-                    </DialogHeader>
-                    {editProducto && (
-                      <div className="grid gap-4">
-                        <Input
-                          placeholder="Nombre"
-                          value={editProducto.nombre || ""}
-                          onChange={(e) =>
-                            setEditProducto({
-                              ...editProducto,
-                              nombre: e.target.value,
-                            })
-                          }
-                        />
-                        <Input
-                          type="number"
-                          placeholder="Cantidad"
-                          value={editProducto.cantidad || ""}
-                          onChange={(e) =>
-                            setEditProducto({
-                              ...editProducto,
-                              cantidad: Number(e.target.value),
-                            })
-                          }
-                        />
-                        <Input
-                          placeholder="Unidad"
-                          value={editProducto.unidad || ""}
-                          onChange={(e) =>
-                            setEditProducto({
-                              ...editProducto,
-                              unidad: e.target.value,
-                            })
-                          }
-                        />
-                        <DialogClose asChild>
-                          <Button onClick={handleEditarProducto}>
-                            Guardar Cambios
-                          </Button>
-                        </DialogClose>
-                      </div>
-                    )}
-                  </DialogContent>
-                </Dialog>
-                <Button
-                  variant="destructive"
-                  onClick={() => handleDelete(producto.id)}
-                  className="ml-2"
-                >
-                  Eliminar
-                </Button>
-              </TableCell>
+      {/* Tabla en pantallas grandes */}
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Stock</TableHead>
+              <TableHead>Unidad</TableHead>
+              <TableHead>Última Actualización</TableHead>
+              <TableHead>Acciones</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {productos.map((producto) => (
+              <TableRow key={producto.id}>
+                <TableCell>{producto.id}</TableCell>
+                <TableCell>{producto.nombre}</TableCell>
+                <TableCell>{producto.cantidad}</TableCell>
+                <TableCell>{producto.unidad}</TableCell>
+                <TableCell>
+                  {new Date(producto.ultimaActualizacion).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="flex items-center gap-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        onClick={() => setEditProducto(producto)}
+                      >
+                        Editar
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Editar Producto</DialogTitle>
+                      </DialogHeader>
+                      {editProducto && (
+                        <div className="grid gap-4">
+                          <Input
+                            placeholder="Nombre"
+                            value={editProducto.nombre || ""}
+                            onChange={(e) =>
+                              setEditProducto({
+                                ...editProducto,
+                                nombre: e.target.value,
+                              })
+                            }
+                          />
+                          <Input
+                            type="number"
+                            placeholder="Cantidad"
+                            value={editProducto.cantidad || ""}
+                            onChange={(e) =>
+                              setEditProducto({
+                                ...editProducto,
+                                cantidad: Number(e.target.value),
+                              })
+                            }
+                          />
+                          <Input
+                            placeholder="Unidad"
+                            value={editProducto.unidad || ""}
+                            onChange={(e) =>
+                              setEditProducto({
+                                ...editProducto,
+                                unidad: e.target.value,
+                              })
+                            }
+                          />
+                          <DialogClose asChild>
+                            <Button onClick={handleEditarProducto}>
+                              Guardar Cambios
+                            </Button>
+                          </DialogClose>
+                        </div>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleDelete(producto.id)}
+                    className="ml-2"
+                  >
+                    Eliminar
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Tarjetas en pantallas pequeñas */}
+      <div className="md:hidden grid gap-4">
+        {productos.map((producto) => (
+          <div
+            key={producto.id}
+            className="p-4 border rounded-lg bg-white shadow dark:bg-slate-800"
+          >
+            <h2 className="text-lg font-semibold mb-2">{producto.nombre}</h2>
+            <p>
+              <strong>ID:</strong> {producto.id}
+            </p>
+            <p>
+              <strong>Stock:</strong> {producto.cantidad}
+            </p>
+            <p>
+              <strong>Unidad:</strong> {producto.unidad}
+            </p>
+            <p>
+              <strong>Última Actualización:</strong>{" "}
+              {new Date(producto.ultimaActualizacion).toLocaleDateString()}
+            </p>
+            <div className="mt-2 flex items-center gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    onClick={() => setEditProducto(producto)}
+                  >
+                    Editar
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Editar Producto</DialogTitle>
+                  </DialogHeader>
+                  {editProducto && (
+                    <div className="grid gap-4">
+                      <Input
+                        placeholder="Nombre"
+                        value={editProducto.nombre || ""}
+                        onChange={(e) =>
+                          setEditProducto({
+                            ...editProducto,
+                            nombre: e.target.value,
+                          })
+                        }
+                      />
+                      <Input
+                        type="number"
+                        placeholder="Cantidad"
+                        value={editProducto.cantidad || ""}
+                        onChange={(e) =>
+                          setEditProducto({
+                            ...editProducto,
+                            cantidad: Number(e.target.value),
+                          })
+                        }
+                      />
+                      <Input
+                        placeholder="Unidad"
+                        value={editProducto.unidad || ""}
+                        onChange={(e) =>
+                          setEditProducto({
+                            ...editProducto,
+                            unidad: e.target.value,
+                          })
+                        }
+                      />
+                      <DialogClose asChild>
+                        <Button onClick={handleEditarProducto}>
+                          Guardar Cambios
+                        </Button>
+                      </DialogClose>
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="destructive"
+                onClick={() => handleDelete(producto.id)}
+              >
+                Eliminar
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

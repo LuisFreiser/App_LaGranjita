@@ -1,3 +1,4 @@
+//Este codigo es para obtimizar las conexiones a la base de datos de vercel
 import { PrismaClient } from "@prisma/client";
 
 const prismaClientSingleton = () => {

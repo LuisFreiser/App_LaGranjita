@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./styles/globals.css";
 import Navbar from "@/components/Navbar";
 import { ToastProvider } from "@/components/providers/ToastProvider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,16 +31,23 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="h-screen">
-          {/* Menú lateral fijo */}
-          <Navbar />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="h-screen">
+            {/* Menú lateral fijo */}
+            <Navbar />
 
-          {/* Contenido principal con flex-grow */}
-          <main className="bg-gray-50 p-6 overflow-y-auto ml-0 md:ml-64">
-            {children}
-            <ToastProvider />
-          </main>
-        </div>
+            {/* Contenido principal con flex-grow */}
+            <main className="p-6 overflow-y-auto ml-0 md:ml-64">
+              {children}
+              <ToastProvider />
+            </main>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
