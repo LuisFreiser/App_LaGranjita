@@ -42,6 +42,8 @@ export default function ProductosPage() {
     null
   );
 
+  //FUNCION PARA OBTENER TODOS LOS PRODUCTOS EN API RUTAS ESTATICAS
+
   useEffect(() => {
     const fetchProductos = async () => {
       try {
@@ -62,22 +64,7 @@ export default function ProductosPage() {
     fetchProductos();
   }, []);
 
-  const handleDelete = async (id: number) => {
-    if (confirm("¿Estás seguro de eliminar este producto?")) {
-      try {
-        const response = await fetch(`/api/productos/${id}`, {
-          method: "DELETE",
-        });
-        if (response.ok) {
-          setProductos((prev) => prev.filter((producto) => producto.id !== id));
-        } else {
-          alert("Error al eliminar el producto");
-        }
-      } catch (error) {
-        console.error("Error al eliminar el producto", error);
-      }
-    }
-  };
+  //FUNCION PARA CREAR PRODUCTOS EN API RUTAS ESTATICAS
 
   const handleCrearProducto = async () => {
     if (!nuevoProducto.nombre || !nuevoProducto.cantidad) {
@@ -106,6 +93,8 @@ export default function ProductosPage() {
     }
   };
 
+  //FUNCION PARA EDITAR PRODUCTOS X ID EN API RUTAS DINAMICAS
+
   const handleEditarProducto = async () => {
     if (!editProducto) return;
 
@@ -128,7 +117,62 @@ export default function ProductosPage() {
     }
   };
 
-  // <p>Cargando productos...</p>;
+  //FUNCION PARA ELIMINAR PRODUCTOS X ID EN API RUTAS DINAMICAS
+
+  const handleDelete = async (id: number) => {
+    toast.custom(
+      (t) => (
+        <div className="bg-white p-4 rounded-lg shadow-lg">
+          <p className="text-red-600 font-bold mb-4">
+            ¿Estás seguro de que deseas eliminar este producto?
+          </p>
+          <div className="flex justify-end space-x-2">
+            <button
+              onClick={() => toast.dismiss(t)}
+              className="px-4 py-2 text-red-600 border border-red-600 rounded hover:bg-red-50"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={async () => {
+                toast.dismiss(t);
+                try {
+                  const response = await fetch(`/api/productos/${id}`, {
+                    method: "DELETE",
+                  });
+
+                  if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                      errorData.error || "No se pudo eliminar el producto"
+                    );
+                  }
+
+                  setProductos((prev) =>
+                    prev.filter((producto) => producto.id !== id)
+                  );
+                  toast.success("Producto eliminado");
+                } catch (error) {
+                  console.error("Error al eliminar el producto", error);
+                  toast.error("Error al eliminar el producto");
+                }
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        duration: Infinity,
+        position: "top-center",
+        className: "custom-toast-container",
+      }
+    );
+  };
+
+  // CARGANDO LOADER DE PRODUCTOS
   if (loading)
     return (
       <div className="fixed inset-0 z-50 flex justify-center items-center h-full">
@@ -140,6 +184,8 @@ export default function ProductosPage() {
   return (
     <div className="container mx-auto p-4 rounded-lg shadow-lg bg-white dark:bg-slate-900 dark:shadow-slate-700">
       <h1 className="text-3xl font-bold mb-4">Productos</h1>
+
+      {/* BOTON DIALOGO PARA CREAR UN NUEVO PRODUCTO */}
       <Dialog>
         <DialogTrigger asChild>
           <Button className="mb-4">Agregar Producto</Button>
@@ -187,7 +233,7 @@ export default function ProductosPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Tabla en pantallas grandes */}
+      {/* TABLA EN PANTALLAS GRANDE DESKTOP */}
       <div className="hidden md:block">
         <Table>
           <TableHeader>
@@ -211,6 +257,7 @@ export default function ProductosPage() {
                   {new Date(producto.ultimaActualizacion).toLocaleDateString()}
                 </TableCell>
                 <TableCell className="flex items-center gap-2">
+                  {/* BOTON DIALOGO PARA EDITAR UN PRODUCTO */}
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button
@@ -280,7 +327,7 @@ export default function ProductosPage() {
         </Table>
       </div>
 
-      {/* Tarjetas en pantallas pequeñas */}
+      {/* TARJETAS PARA PANTALLAS MOBILES */}
       <div className="md:hidden grid gap-4">
         {productos.map((producto) => (
           <div
@@ -302,6 +349,7 @@ export default function ProductosPage() {
               {new Date(producto.ultimaActualizacion).toLocaleDateString()}
             </p>
             <div className="mt-2 flex items-center gap-2">
+              {/* BOTON DIALOGO PARA EDITAR UN PRODUCTO */}
               <Dialog>
                 <DialogTrigger asChild>
                   <Button

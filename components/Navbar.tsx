@@ -82,15 +82,6 @@ export default function Navbar() {
 
         {/* Botón de modo oscuro */}
         <div className="p-4 border-t">
-          {/* <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => {
-              document.documentElement.classList.toggle("dark");
-            }}
-          >
-            Cambiar Modo 🌙
-          </Button> */}
           <ToggleTheme />
         </div>
       </aside>

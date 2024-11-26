@@ -45,6 +45,8 @@ export default function PedidosPage() {
   //Use State para el filtro de Productos en select
   const [productos, setProductos] = useState<string[]>([]);
 
+  // FUNCION PARA CARGAR TODOS LOS PEDIDOS EN LA TABLA
+
   const fetchPedidos = async () => {
     try {
       const response = await fetch("/api/pedidos");
@@ -57,6 +59,8 @@ export default function PedidosPage() {
       setLoading(false);
     }
   };
+
+  // FUNCION PARA CREAR UN NUEVO PEDIDO
 
   const handleCrearPedido = async () => {
     // Validaciones
@@ -97,31 +101,8 @@ export default function PedidosPage() {
       toast.error("Error al crear el pedido");
     }
   };
-  const handleEliminarPedido = async (id: number) => {
-    try {
-      const response = await fetch("/api/pedidos", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        if (data.devueltoAlStock) {
-          toast.success("Pedido eliminado. Stock actualizado.");
-        } else {
-          toast.success("Pedido eliminado");
-        }
-        fetchPedidos();
-      } else {
-        toast.error(data.error || "Error al eliminar pedido");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Error al eliminar pedido");
-    }
-  };
+  // FUNCION PARA EDITAR UN PEDIDO
 
   const handleEditarPedido = async () => {
     if (!editPedido) return;
@@ -141,8 +122,84 @@ export default function PedidosPage() {
     }
   };
 
+  // FUNCION PARA ELIMINAR UN PEDIDO X ID RUTA DE API ESTATICA
+
+  const handleEliminarPedido = async (id: number) => {
+    toast.custom(
+      (t) => (
+        <div className="bg-white p-4 rounded-lg shadow-lg">
+          <p className="text-red-600 font-bold mb-4">
+            ¿Estás seguro de que deseas eliminar este pedido?
+          </p>
+          <div className="flex justify-end space-x-2">
+            <button
+              onClick={() => toast.dismiss(t)}
+              className="px-4 py-2 text-red-600 border border-red-600 rounded hover:bg-red-50"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={async () => {
+                toast.dismiss(t);
+                try {
+                  const response = await fetch("/api/pedidos", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id }),
+                  });
+
+                  // Verificar el estado de la respuesta
+                  if (!response.ok) {
+                    // Intentar obtener el mensaje de error del servidor
+                    const errorData = await response.json();
+                    throw new Error(
+                      errorData.error || "No se pudo eliminar el pedido"
+                    );
+                  }
+
+                  const data = await response.json();
+
+                  // Mensaje de éxito dependiendo de si se devolvió stock
+                  if (data.devueltoAlStock) {
+                    toast.success("Pedido eliminado. Stock actualizado.");
+                  } else {
+                    toast.success("Pedido eliminado");
+                  }
+
+                  // Actualizar la lista de pedidos
+                  fetchPedidos();
+                } catch (error) {
+                  console.error("Error al eliminar pedido:", error);
+
+                  // Manejo de errores más específico
+                  if (error instanceof Error) {
+                    toast.error(
+                      error.message || "No se pudo eliminar el pedido"
+                    );
+                  } else {
+                    toast.error(
+                      "Ocurrió un error desconocido al eliminar el pedido"
+                    );
+                  }
+                }
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        duration: Infinity,
+        position: "top-center",
+        className: "custom-toast-container",
+      }
+    );
+  };
+
   useEffect(() => {
-    // Lógica para cargar productos a select desde la BD
+    // Lógica para cargar a select  productos desde la BD
     const fetchProductos = async () => {
       try {
         const response = await fetch("/api/productos");
@@ -156,6 +213,8 @@ export default function PedidosPage() {
     fetchPedidos();
   }, []);
 
+  //LLAMANDO AL LOADER (CAEGANDO PEDIDOS)
+
   if (loading)
     return (
       <div className="fixed inset-0 z-50 flex justify-center items-center h-full">
@@ -168,7 +227,7 @@ export default function PedidosPage() {
     <div className="container mx-auto p-4 rounded-lg shadow-lg bg-white dark:bg-slate-900 dark:shadow-slate-700">
       <h1 className="text-3xl font-bold mb-4">Pedidos</h1>
 
-      {/* Botón y Diálogo para Nuevo Pedido */}
+      {/* BOTON DIALOGO PARA CREAR UN NUEVO PEDIDO */}
       <Dialog>
         <DialogTrigger asChild>
           <Button className="mb-4">Nuevo Pedido</Button>
@@ -254,7 +313,7 @@ export default function PedidosPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Tabla en pantallas grandes */}
+      {/* TABLA EN DESKTOP PANTALLAS GRANDES */}
       <div className="hidden md:block">
         <Table>
           <TableHeader>
@@ -278,6 +337,7 @@ export default function PedidosPage() {
                 <TableCell>{pedido.estado}</TableCell>
                 <TableCell>{pedido.precioTotal}</TableCell>
                 <TableCell className="flex items-center gap-2">
+                  {/* BOTON DIALOGO PARA EDITAR UN PEDIDO */}
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button
@@ -367,7 +427,7 @@ export default function PedidosPage() {
         </Table>
       </div>
 
-      {/* Tarjetas en pantallas pequeñas */}
+      {/* PARA TARJETAS EN MOVILES */}
       <div className="md:hidden grid gap-4">
         {pedidos.map((pedido) => (
           <div
@@ -390,6 +450,7 @@ export default function PedidosPage() {
               <strong>Total:</strong> S/ {pedido.precioTotal}
             </p>
             <div className="mt-2 flex items-center gap-2">
+              {/* BOTON DIALOGO PARA EDITAR UN PEDIDO */}
               <Dialog>
                 <DialogTrigger asChild>
                   <Button

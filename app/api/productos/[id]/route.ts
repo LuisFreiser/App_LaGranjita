@@ -1,7 +1,10 @@
+//USANDO RUTAS DE API DINAMICAS DE NEXT
+
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
-// DELETE para eliminar un producto
+// DELETE PARA ELIMINAR UN PRODUCTO X ID
+
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
@@ -21,7 +24,9 @@ export async function DELETE(
     );
   }
 }
-// PUT para actualizar todos los campos de la tabla producto
+
+// PUT PARA ACTUALIZAR UN PRODUCTO X ID
+
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
@@ -43,31 +48,3 @@ export async function PUT(
     );
   }
 }
-
-// export async function GET(
-//   request: Request,
-//   { params }: { params: { id: string } }
-// ) {
-//   const { id } = params;
-
-//   try {
-//     const producto = await prisma.producto.findUnique({
-//       where: { id: parseInt(id) },
-//     });
-
-//     if (!producto) {
-//       return NextResponse.json(
-//         { error: "Producto no encontrado" },
-//         { status: 404 }
-//       );
-//     }
-
-//     return NextResponse.json(producto);
-//   } catch (error) {
-//     console.error("Error al obtener el producto:", error);
-//     return NextResponse.json(
-//       { error: "Error al obtener producto" },
-//       { status: 500 }
-//     );
-//   }
-// }

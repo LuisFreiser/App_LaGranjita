@@ -1,7 +1,10 @@
+//USANDO RUTAS DE API ESTATICAS DE NEXT
+
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
-// POST para crear un nuevo pedido
+//POST PARA CREAR UN NUEVO PEDIDO
+
 export async function POST(request: NextRequest) {
   try {
     const {
@@ -70,7 +73,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET para obtener todos los pedidos
+//GET PARA OBTENER TODOS LOS PEDIDOS
+
 export async function GET() {
   try {
     const pedidos = await prisma.pedido.findMany();
@@ -84,7 +88,8 @@ export async function GET() {
   }
 }
 
-// PUT para actualizar un pedido
+// PUT PARA ACTUALIZAR UN PEDIDO
+
 export async function PUT(request: NextRequest) {
   try {
     const { id, cliente, producto, cantidad, precioUnitario, estado } =
@@ -115,16 +120,25 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE para eliminar un pedido
+// DELETE PARA ELIMINAR UN PEDIDO
+
 export async function DELETE(request: NextRequest) {
   try {
     const { id } = await request.json();
+
+    // Validar que el ID sea un número válido
+    if (!id || isNaN(Number(id))) {
+      return NextResponse.json(
+        { error: "ID de pedido inválido" },
+        { status: 400 }
+      );
+    }
 
     // Realizar la eliminación del pedido en una transacción
     const resultado = await prisma.$transaction(async (prisma) => {
       // Primero, buscar los detalles del pedido
       const pedido = await prisma.pedido.findUnique({
-        where: { id },
+        where: { id: Number(id) },
         select: {
           estado: true,
           producto: true,
@@ -132,7 +146,7 @@ export async function DELETE(request: NextRequest) {
         },
       });
 
-      // Si no se encuentra el pedido, lanzar un error
+      // Si no se encuentra el pedido, lanzar un error específico
       if (!pedido) {
         throw new Error("Pedido no encontrado");
       }
@@ -145,7 +159,7 @@ export async function DELETE(request: NextRequest) {
         });
 
         if (!producto) {
-          throw new Error("Producto no encontrado");
+          throw new Error(`Producto "${pedido.producto}" no encontrado`);
         }
 
         // Actualizar el stock del producto
@@ -160,18 +174,37 @@ export async function DELETE(request: NextRequest) {
 
       // Eliminar el pedido
       return prisma.pedido.delete({
-        where: { id },
+        where: { id: Number(id) },
       });
     });
 
-    return NextResponse.json({
-      message: "Pedido eliminado",
-      devueltoAlStock: resultado.estado === "Pendiente",
-    });
-  } catch (error) {
-    console.error(error);
     return NextResponse.json(
-      { error: "Error al eliminar pedido" },
+      {
+        message: "Pedido eliminado exitosamente",
+        devueltoAlStock: resultado.estado === "Pendiente",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error detallado al eliminar pedido:", error);
+
+    // Manejo de errores más específico
+    if (error instanceof Error) {
+      return NextResponse.json(
+        {
+          error: error.message || "Error al eliminar pedido",
+          details: error.toString(),
+        },
+        { status: 500 }
+      );
+    }
+
+    // Caso genérico para errores no identificados
+    return NextResponse.json(
+      {
+        error: "Error desconocido al eliminar pedido",
+        details: JSON.stringify(error),
+      },
       { status: 500 }
     );
   }

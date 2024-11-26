@@ -1,7 +1,10 @@
+//USANDO RUTAS DE API ESTATICAS DE NEXT
+
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
-// POST para crear un nuevo producto
+// POST PARA CREAR UN NUEVO PRODUCTO
+
 export async function POST(request: Request) {
   const body = await request.json();
 
@@ -38,7 +41,9 @@ export async function POST(request: Request) {
     );
   }
 }
-// GET para obtener todos los productos
+
+// GET PARA OBTENER TODOS LOS PRODUCTOS
+
 export async function GET() {
   try {
     const productos = await prisma.producto.findMany();

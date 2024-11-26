@@ -1,7 +1,10 @@
+//USANDO RUTAS DE API DINAMICAS DE NEXT
+
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
-//PATCH sirve para actualizar solo algunos campos de la tabla pedido
+//PATCH PARA ACTUALIZAR CAMPOS ESPECIFICOS DE UN PEDIDO (ESTADO)
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
