@@ -42,7 +42,7 @@ export default function RootLayout({
             <Sidebar />
 
             {/* Contenido principal con flex-grow */}
-            <main className="flex-grow p-6 overflow-y-auto ml-0 md:ml-64 mt-16 md:mt-14">
+            <main className="flex-grow p-6 overflow-y-auto ml-0 bg-gray-100 dark:bg-gray-900 md:ml-64 mt-16 md:mt-14">
               {children}
               <ToastProvider />
             </main>

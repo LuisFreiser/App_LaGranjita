@@ -100,7 +100,7 @@ export default function ReporteVentas() {
   };
 
   return (
-    <div className="p-4 sm:p-6 w-full mx-auto">
+    <div className="p-4 sm:p-6 w-full mx-auto rounded-lg shadow-lg bg-white">
       <h1 className="text-xl sm:text-3xl font-bold mb-4 text-center sm:text-left">
         Reporte de Ventas
       </h1>
@@ -169,7 +169,7 @@ export default function ReporteVentas() {
           <div className="overflow-x-auto mb-4">
             <Table className="min-w-full border">
               <TableHeader>
-                <TableRow>
+                <TableRow className="bg-slate-100">
                   <TableHead>Cliente</TableHead>
                   <TableHead>Producto</TableHead>
                   <TableHead>Fecha</TableHead>

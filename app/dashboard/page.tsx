@@ -190,7 +190,7 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-red-500/30 hover:border-red-500/50 transition-all">
+        <Card className="border-green-500/30 hover:border-green-500/50 transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle>Ventas del Día</CardTitle>
             <DollarSign className="h-5 w-5 text-green-500" />
@@ -206,7 +206,7 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Tabla de pedidos recientes */}
+      {/* TABLA DE PEDIDOS PENDIENTES */}
       <div className="container mt-4 mx-auto p-4 rounded-lg shadow-lg bg-white dark:bg-slate-900 dark:shadow-slate-700">
         <h2 className="text-xl font-semibold mb-4">Pedidos Pendientes</h2>
         {loading ? (
@@ -217,9 +217,9 @@ export default function Dashboard() {
         ) : pedidos.filter((pedido) => pedido.estado === "Pendiente").length >
           0 ? (
           <>
-            <Table>
+            <Table className="border">
               <TableHeader>
-                <TableRow>
+                <TableRow className="bg-slate-100">
                   <TableHead>ID</TableHead>
                   <TableHead>Cliente</TableHead>
                   <TableHead>Producto</TableHead>
@@ -255,7 +255,7 @@ export default function Dashboard() {
               </TableBody>
             </Table>
 
-            {/* Componente de Paginación */}
+            {/* COMPONENTE DE PAGINACIÓN */}
             {totalPaginas > 1 && (
               <Pagination className="mt-4">
                 <PaginationContent>
@@ -265,17 +265,18 @@ export default function Dashboard() {
                       className={
                         paginaActual === 1
                           ? "pointer-events-none opacity-50"
-                          : ""
+                          : "cursor-pointer"
                       }
                     />
                   </PaginationItem>
 
-                  {/* Generar números de página */}
+                  {/* GENERAR NUMERO DE PAGINAS */}
                   {[...Array(totalPaginas)].map((_, index) => (
                     <PaginationItem key={index}>
                       <PaginationLink
                         onClick={() => irAPagina(index + 1)}
                         isActive={paginaActual === index + 1}
+                        className="cursor-pointer"
                       >
                         {index + 1}
                       </PaginationLink>
@@ -288,7 +289,7 @@ export default function Dashboard() {
                       className={
                         paginaActual === totalPaginas
                           ? "pointer-events-none opacity-50"
-                          : ""
+                          : "cursor-pointer"
                       }
                     />
                   </PaginationItem>

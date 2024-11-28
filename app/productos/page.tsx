@@ -234,10 +234,10 @@ export default function ProductosPage() {
       </Dialog>
 
       {/* TABLA EN PANTALLAS GRANDE DESKTOP */}
-      <div className="hidden md:block">
+      <div className="hidden border md:block">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="bg-slate-100">
               <TableHead>ID</TableHead>
               <TableHead>Nombre</TableHead>
               <TableHead>Stock</TableHead>

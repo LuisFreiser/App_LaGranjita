@@ -315,15 +315,15 @@ export default function PedidosPage() {
 
       {/* TABLA EN DESKTOP PANTALLAS GRANDES */}
       <div className="hidden md:block">
-        <Table>
+        <Table className="border">
           <TableHeader>
-            <TableRow>
+            <TableRow className="bg-slate-100">
               <TableHead>ID</TableHead>
               <TableHead>Cliente</TableHead>
               <TableHead>Producto</TableHead>
               <TableHead>Cantidad</TableHead>
               <TableHead>Estado</TableHead>
-              <TableHead>Total S/</TableHead>
+              <TableHead>Total</TableHead>
               <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
@@ -335,7 +335,7 @@ export default function PedidosPage() {
                 <TableCell>{pedido.producto}</TableCell>
                 <TableCell>{pedido.cantidad}</TableCell>
                 <TableCell>{pedido.estado}</TableCell>
-                <TableCell>{pedido.precioTotal}</TableCell>
+                <TableCell>S/. {pedido.precioTotal.toFixed(2)}</TableCell>
                 <TableCell className="flex items-center gap-2">
                   {/* BOTON DIALOGO PARA EDITAR UN PEDIDO */}
                   <Dialog>
