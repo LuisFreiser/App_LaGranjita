@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table"; // Tabla Shadcn
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto"; // Importación necesaria para gráficos
+import { CalendarDays } from "lucide-react";
 
 export default function ReporteVentas() {
   type Venta = {
@@ -141,9 +142,9 @@ export default function ReporteVentas() {
       <h1 className="text-xl sm:text-3xl font-bold mb-4 text-center sm:text-left">
         Reporte de Ventas por Día
       </h1>
-      {/* Contenedor de filtros */}
+      {/* Contenedor inputs fechas para la consulta  */}
       <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4">
-        <Input
+        {/* <Input
           type="date"
           value={fechaInicio}
           onChange={(e) => setFechaInicio(e.target.value)}
@@ -156,7 +157,33 @@ export default function ReporteVentas() {
           onChange={(e) => setFechaFin(e.target.value)}
           placeholder="Fecha de Fin"
           className="w-full sm:w-auto"
-        />
+        /> */}
+        <div className="relative w-full sm:w-auto">
+          <Input
+            type="date"
+            value={fechaInicio}
+            onChange={(e) => setFechaInicio(e.target.value)}
+            placeholder="Fecha de Inicio"
+            className="w-full appearance-none pl-10"
+          />
+          <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+            <CalendarDays className="h-5 w-5 text-gray-500" />
+          </div>
+        </div>
+
+        <div className="relative w-full sm:w-auto">
+          <Input
+            type="date"
+            value={fechaFin}
+            onChange={(e) => setFechaFin(e.target.value)}
+            placeholder="Fecha de Fin"
+            className="w-full appearance-none pl-10"
+          />
+          <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+            <CalendarDays className="h-5 w-5 text-gray-500" />
+          </div>
+        </div>
+
         <Button onClick={generarReporte} className="w-full sm:w-auto">
           Generar Reporte
         </Button>
