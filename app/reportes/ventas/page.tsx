@@ -75,61 +75,134 @@ export default function ReporteVentas() {
       .toFixed(2);
   };
 
+  //   return (
+  //     <div className="p-6">
+  //       <h1 className="text-2xl font-bold mb-4">Reporte de Ventas por Día</h1>
+  //       <div className="flex gap-4 mb-4">
+  //         <Input
+  //           type="date"
+  //           value={fechaInicio}
+  //           onChange={(e) => setFechaInicio(e.target.value)}
+  //           placeholder="Fecha de Inicio"
+  //         />
+  //         <Input
+  //           type="date"
+  //           value={fechaFin}
+  //           onChange={(e) => setFechaFin(e.target.value)}
+  //           placeholder="Fecha de Fin"
+  //         />
+  //         <Button onClick={generarReporte}>Generar Reporte</Button>
+  //       </div>
+
+  //       {ventas.length > 0 && (
+  //         <div>
+  //           <Table className="mb-4">
+  //             <TableHeader>
+  //               <TableRow>
+  //                 <TableHead>Cliente</TableHead>
+  //                 <TableHead>Producto</TableHead>
+  //                 <TableHead>Fecha</TableHead>
+  //                 <TableHead>Cantidad</TableHead>
+  //                 <TableHead>Ingresos</TableHead>
+  //               </TableRow>
+  //             </TableHeader>
+  //             <TableBody>
+  //               {ventas.map((venta, index) => (
+  //                 <TableRow key={index}>
+  //                   <TableCell>{venta.cliente}</TableCell>
+  //                   <TableCell>{venta.producto}</TableCell>
+  //                   <TableCell>
+  //                     {new Date(venta.createdAt).toLocaleDateString()}
+  //                   </TableCell>
+  //                   <TableCell>{venta.cantidad}</TableCell>
+  //                   <TableCell>S/. {venta.precioTotal.toFixed(2)}</TableCell>
+  //                 </TableRow>
+  //               ))}
+  //               {/* Fila para el total */}
+  //               <TableRow className="font-bold bg-gray-100">
+  //                 <TableCell colSpan={4} className="text-right">
+  //                   Total:
+  //                 </TableCell>
+  //                 <TableCell>S/. {calcularIngresosTotales()}</TableCell>
+  //               </TableRow>
+  //             </TableBody>
+  //           </Table>
+
+  //           <div className="mt-6">
+  //             <Bar data={graficoDatos} />
+  //           </div>
+  //         </div>
+  //       )}
+  //     </div>
+  //   );
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Reporte de Ventas por Día</h1>
-      <div className="flex gap-4 mb-4">
+    <div className="p-4 sm:p-6 w-full mx-auto">
+      <h1 className="text-xl sm:text-3xl font-bold mb-4 text-center sm:text-left">
+        Reporte de Ventas por Día
+      </h1>
+      {/* Contenedor de filtros */}
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4">
         <Input
           type="date"
           value={fechaInicio}
           onChange={(e) => setFechaInicio(e.target.value)}
           placeholder="Fecha de Inicio"
+          className="w-full sm:w-auto"
         />
         <Input
           type="date"
           value={fechaFin}
           onChange={(e) => setFechaFin(e.target.value)}
           placeholder="Fecha de Fin"
+          className="w-full sm:w-auto"
         />
-        <Button onClick={generarReporte}>Generar Reporte</Button>
+        <Button onClick={generarReporte} className="w-full sm:w-auto">
+          Generar Reporte
+        </Button>
       </div>
 
+      {/* Tabla y gráficos */}
       {ventas.length > 0 && (
         <div>
-          <Table className="mb-4">
-            <TableHeader>
-              <TableRow>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Producto</TableHead>
-                <TableHead>Fecha</TableHead>
-                <TableHead>Cantidad</TableHead>
-                <TableHead>Ingresos</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {ventas.map((venta, index) => (
-                <TableRow key={index}>
-                  <TableCell>{venta.cliente}</TableCell>
-                  <TableCell>{venta.producto}</TableCell>
-                  <TableCell>
-                    {new Date(venta.createdAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>{venta.cantidad}</TableCell>
-                  <TableCell>S/. {venta.precioTotal.toFixed(2)}</TableCell>
+          {/* Contenedor para tabla */}
+          <div className="overflow-x-auto mb-4">
+            <Table className="min-w-full border">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Producto</TableHead>
+                  <TableHead>Fecha</TableHead>
+                  <TableHead>Cantidad</TableHead>
+                  <TableHead>Ingresos</TableHead>
                 </TableRow>
-              ))}
-              {/* Fila para el total */}
-              <TableRow className="font-bold bg-gray-100">
-                <TableCell colSpan={4} className="text-right">
-                  Total:
-                </TableCell>
-                <TableCell>S/. {calcularIngresosTotales()}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {ventas.map((venta, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{venta.cliente}</TableCell>
+                    <TableCell>{venta.producto}</TableCell>
+                    <TableCell>
+                      {new Date(venta.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>{venta.cantidad}</TableCell>
+                    <TableCell>S/. {venta.precioTotal.toFixed(2)}</TableCell>
+                  </TableRow>
+                ))}
+                {/* Fila para el total */}
+                <TableRow className="font-bold bg-gray-100">
+                  <TableCell colSpan={4} className="text-right">
+                    Total:
+                  </TableCell>
+                  <TableCell>S/. {calcularIngresosTotales()}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
 
+          {/* Contenedor para gráfico */}
           <div className="mt-6">
-            <Bar data={graficoDatos} />
+            <Bar data={graficoDatos} className="w-full h-64 sm:h-96" />
           </div>
         </div>
       )}
