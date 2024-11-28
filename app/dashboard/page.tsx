@@ -19,8 +19,7 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { DollarSign } from "lucide-react";
-import { Loader2 } from "lucide-react";
+import { Package, DollarSign, ShoppingCart, Loader2 } from "lucide-react";
 
 type Pedido = {
   id: number;
@@ -163,8 +162,9 @@ export default function Dashboard() {
       {/* Sección de métricas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle>Pedidos Pendientes</CardTitle>
+            <ShoppingCart className="h-5 w-5 text-gray-500" />
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">
@@ -173,8 +173,9 @@ export default function Dashboard() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle>Stock Actual</CardTitle>
+            <Package className="h-5 w-5 text-gray-500" />
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">

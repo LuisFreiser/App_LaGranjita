@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./styles/globals.css";
-import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
 import { ToastProvider } from "@/components/providers/ToastProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -37,12 +37,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="h-screen">
+          <div className="h-screen flex">
             {/* Menú lateral fijo */}
-            <Navbar />
+            <Sidebar />
 
             {/* Contenido principal con flex-grow */}
-            <main className="p-6 overflow-y-auto ml-0 md:ml-64">
+            <main className="flex-grow p-6 overflow-y-auto ml-0 md:ml-64 mt-16 md:mt-14">
               {children}
               <ToastProvider />
             </main>

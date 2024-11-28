@@ -12,21 +12,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface ToggleThemeProps {
-  className?: string;
-  // Agrega otras props que desees pasar al componente
-}
+// Definición de la interfaz para las props del componente Modo Oscuro
+// interface ToggleThemeProps {
+//   className?: string;
+// Agrega otras props que desees pasar al componente
+//}
 
-export function ToggleTheme({ className }: ToggleThemeProps) {
+export function ToggleTheme() {
+  //Esto va como parametros de la funcion ToggleTheme({ className }: ToggleThemeProps)
+
   const { setTheme } = useTheme();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="w-full">
+        <Button variant="outline" size="icon">
           <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 md:mr-24" />
-          <span className={className}>Cambiar Tema</span>
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          {/* <span className={className}>Cambiar Tema</span> */}
+          <span className="sr-only">Cambiar Tema</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
