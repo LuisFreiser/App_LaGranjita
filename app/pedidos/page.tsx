@@ -655,7 +655,7 @@ export default function PedidosPage() {
       });
 
       if (response.ok) {
-        const pedidoCreado = await response.json();
+        // const pedidoCreado = await response.json();
 
         // Actualizar stock del producto
         if (productoSeleccionado) {
