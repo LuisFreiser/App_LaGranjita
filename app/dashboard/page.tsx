@@ -17,6 +17,21 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Package, DollarSign, ShoppingCart, Loader2 } from "lucide-react";
@@ -29,6 +44,7 @@ type Pedido = {
   estado: string;
   precioTotal: number;
   createdAt: string;
+  medioDePago: string;
 };
 
 type Producto = {
@@ -133,12 +149,17 @@ export default function Dashboard() {
     return productos.reduce((total, producto) => total + producto.cantidad, 0);
   };
 
-  const handleEntregarPedido = async (pedidoId: number) => {
+  // FUNCION PARA ENTREGA Y CANCELAR PEDIDOS
+
+  const handleEntregarPedido = async (
+    pedidoId: number,
+    medioDePago: string
+  ) => {
     try {
       const response = await fetch(`/api/pedidos/${pedidoId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ estado: "Entregado" }),
+        body: JSON.stringify({ estado: "Entregado", medioDePago: medioDePago }),
       });
 
       if (response.ok) {
@@ -149,7 +170,7 @@ export default function Dashboard() {
         toast.error(errorData.error || "Error al entregar el pedido");
       }
     } catch (error) {
-      console.error("Error al entregar pedido:", error);
+      console.error("Error al entregar el pedido:", error);
       toast.error("Error al entregar el pedido");
     }
   };
@@ -220,11 +241,12 @@ export default function Dashboard() {
             <Table className="border">
               <TableHeader>
                 <TableRow className="bg-slate-100">
-                  <TableHead>ID</TableHead>
+                  {/* <TableHead>ID</TableHead> */}
                   <TableHead>Cliente</TableHead>
                   <TableHead>Producto</TableHead>
-                  <TableHead>Cantidad</TableHead>
                   <TableHead>Fecha</TableHead>
+                  <TableHead>Cantidad</TableHead>
+                  <TableHead>Total</TableHead>
                   <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
@@ -234,20 +256,67 @@ export default function Dashboard() {
                     pedido // Aquí estás usando pedidosPaginados
                   ) => (
                     <TableRow key={pedido.id}>
-                      <TableCell>{pedido.id}</TableCell>
+                      {/* <TableCell>{pedido.id}</TableCell> */}
                       <TableCell>{pedido.cliente}</TableCell>
                       <TableCell>{pedido.producto}</TableCell>
-                      <TableCell>{pedido.cantidad}</TableCell>
                       <TableCell>
                         {new Date(pedido.createdAt).toLocaleDateString("es-PE")}
                       </TableCell>
+                      <TableCell>{pedido.cantidad}</TableCell>
+                      <TableCell>S/.{pedido.precioTotal.toFixed(2)}</TableCell>
+
                       <TableCell>
-                        <Button
-                          size="sm"
-                          onClick={() => handleEntregarPedido(pedido.id)}
-                        >
-                          Entregado
-                        </Button>
+                        {/* Aquí estás usando handleEntregarPedido */}
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button size="sm">Entregado</Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                Confirmar Entrega de Pedido
+                              </DialogTitle>
+                            </DialogHeader>
+
+                            <div className="grid gap-4">
+                              <Select
+                                value={pedido.medioDePago || ""}
+                                onValueChange={(value) => {
+                                  // Actualiza el estado local del medio de pago
+                                  setPedidos((prevPedidos) =>
+                                    prevPedidos.map((p) =>
+                                      p.id === pedido.id
+                                        ? { ...p, medioDePago: value }
+                                        : p
+                                    )
+                                  );
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Seleccionar Medio de Pago" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Efectivo">
+                                    Efectivo
+                                  </SelectItem>
+                                  <SelectItem value="Yape">Yape</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <DialogClose asChild>
+                                <Button
+                                  onClick={() =>
+                                    handleEntregarPedido(
+                                      pedido.id,
+                                      pedido.medioDePago
+                                    )
+                                  }
+                                >
+                                  Guardar Cambios
+                                </Button>
+                              </DialogClose>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </TableCell>
                     </TableRow>
                   )

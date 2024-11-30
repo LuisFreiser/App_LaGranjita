@@ -21,6 +21,7 @@ model Pedido {
   cantidad  Int
   estado    String
   precioUnitario Float
+  medioDePago  String     
   precioTotal    Float
   createdAt DateTime @default(now())
 }
@@ -31,4 +32,13 @@ model Producto {
   cantidad           Int
   unidad             String
   ultimaActualizacion DateTime
+}
+
+model Compras {
+  id    Int   @id @default(autoincrement())
+  producto  String
+  fecha  DateTime
+  cantidad Int
+  costoUnidad Float
+  costoTotal  Float
 }

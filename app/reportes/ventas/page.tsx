@@ -33,7 +33,7 @@ export default function ReporteVentas() {
   const [fechaInicio, setFechaInicio] = useState<Date | undefined>(undefined);
   const [fechaFin, setFechaFin] = useState<Date | undefined>(undefined);
 
-  // Estados separados para controlar cada Popover
+  // Estados separados para controlar cada Popover de fechas
   const [isOpenInicio, setIsOpenInicio] = useState(false);
   const [isOpenFin, setIsOpenFin] = useState(false);
 

@@ -12,12 +12,12 @@ export async function PATCH(
   const { id } = params;
 
   try {
-    const { estado } = await request.json();
+    const { estado, medioDePago } = await request.json();
 
     // Actualizar el estado del pedido
     const pedidoActualizado = await prisma.pedido.update({
       where: { id: parseInt(id) },
-      data: { estado },
+      data: { estado, medioDePago },
     });
 
     return NextResponse.json(pedidoActualizado, { status: 200 });

@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -10,17 +17,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Edit, Trash2, Plus, Loader2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type Producto = {
   id: number;
@@ -32,45 +42,38 @@ type Producto = {
 
 export default function ProductosPage() {
   const [productos, setProductos] = useState<Producto[]>([]);
+  const [productoSeleccionado, setProductoSeleccionado] =
+    useState<Producto | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [nuevoProducto, setNuevoProducto] = useState<Partial<Producto>>({
-    nombre: "",
-    cantidad: 0,
-    unidad: "",
-  });
-  const [editProducto, setEditProducto] = useState<Partial<Producto> | null>(
-    null
-  );
 
-  //FUNCION PARA OBTENER TODOS LOS PRODUCTOS EN API RUTAS ESTATICAS
+  const fetchProductos = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/productos");
+      const data = await response.json();
+      setProductos(data);
+    } catch (error) {
+      toast.error("Error al cargar productos");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProductos = async () => {
-      try {
-        const response = await fetch("/api/productos");
-        if (response.ok) {
-          const data = await response.json();
-          setProductos(data);
-        } else {
-          console.error("Error al obtener los productos");
-        }
-      } catch (error) {
-        console.error("Error al conectar con la API", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProductos();
   }, []);
 
-  //FUNCION PARA CREAR PRODUCTOS EN API RUTAS ESTATICAS
+  const handleCrearProducto = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
 
-  const handleCrearProducto = async () => {
-    if (!nuevoProducto.nombre || !nuevoProducto.cantidad) {
-      toast.error("Nombre y cantidad son obligatorios");
-      return;
-    }
+    const nuevoProducto = {
+      nombre: formData.get("nombre") as string,
+      cantidad: parseInt(formData.get("cantidad") as string),
+      unidad: formData.get("unidad") as string,
+    };
 
     try {
       const response = await fetch("/api/productos", {
@@ -80,162 +83,170 @@ export default function ProductosPage() {
       });
 
       if (response.ok) {
+        const productoCreado = await response.json();
         toast.success("Producto creado exitosamente");
-        const newProducto = await response.json();
-        setProductos((prev) => [...prev, newProducto]);
-        setNuevoProducto({ nombre: "", cantidad: 0, unidad: "" });
+        setProductos((prev) => [...prev, productoCreado]);
+        setModalOpen(false);
       } else {
-        toast.error("Error al crear el producto");
+        const errorData = await response.json();
+        toast.error(errorData.error || "Error al crear producto");
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Error al crear el producto");
+      console.error("Error al crear producto:", error);
+      toast.error("Error al crear producto");
     }
   };
 
-  //FUNCION PARA EDITAR PRODUCTOS X ID EN API RUTAS DINAMICAS
+  const handleEditarProducto = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!productoSeleccionado) return;
 
-  const handleEditarProducto = async () => {
-    if (!editProducto) return;
+    const formData = new FormData(e.currentTarget);
+
+    const productoActualizado = {
+      id: productoSeleccionado.id,
+      nombre: formData.get("nombre") as string,
+      cantidad: parseInt(formData.get("cantidad") as string),
+      unidad: formData.get("unidad") as string,
+    };
 
     try {
-      await fetch(`/api/productos/${editProducto.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editProducto),
-      });
-      toast.success("Producto actualizado");
-      setProductos((prev) =>
-        prev.map((p) =>
-          p.id === editProducto.id ? { ...p, ...editProducto } : p
-        )
+      const response = await fetch(
+        `/api/productos/${productoSeleccionado.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(productoActualizado),
+        }
       );
-      setEditProducto(null);
+
+      if (response.ok) {
+        const productoActualizadoRespuesta = await response.json();
+        toast.success("Producto actualizado exitosamente");
+        setProductos((prev) =>
+          prev.map((p) =>
+            p.id === productoSeleccionado.id ? productoActualizadoRespuesta : p
+          )
+        );
+        setModalOpen(false);
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Error al actualizar producto");
+      }
     } catch (error) {
-      console.error(error);
-      toast.error("Error al actualizar el producto");
+      console.error("Error al actualizar producto:", error);
+      toast.error("Error al actualizar producto");
     }
   };
 
-  //FUNCION PARA ELIMINAR PRODUCTOS X ID EN API RUTAS DINAMICAS
+  const handleEliminarProducto = async (id: number) => {
+    try {
+      const response = await fetch(`/api/productos/${id}`, {
+        method: "DELETE",
+      });
 
-  const handleDelete = async (id: number) => {
-    toast.custom(
-      (t) => (
-        <div className="bg-white p-4 rounded-lg shadow-lg">
-          <p className="text-red-600 font-bold mb-4">
-            ¿Estás seguro de que deseas eliminar este producto?
-          </p>
-          <div className="flex justify-end space-x-2">
-            <button
-              onClick={() => toast.dismiss(t)}
-              className="px-4 py-2 text-red-600 border border-red-600 rounded hover:bg-red-50"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={async () => {
-                toast.dismiss(t);
-                try {
-                  const response = await fetch(`/api/productos/${id}`, {
-                    method: "DELETE",
-                  });
-
-                  if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(
-                      errorData.error || "No se pudo eliminar el producto"
-                    );
-                  }
-
-                  setProductos((prev) =>
-                    prev.filter((producto) => producto.id !== id)
-                  );
-                  toast.success("Producto eliminado");
-                } catch (error) {
-                  console.error("Error al eliminar el producto", error);
-                  toast.error("Error al eliminar el producto");
-                }
-              }}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              Eliminar
-            </button>
-          </div>
-        </div>
-      ),
-      {
-        duration: Infinity,
-        position: "top-center",
-        className: "custom-toast-container",
+      if (response.ok) {
+        toast.success("Producto eliminado exitosamente");
+        setProductos((prev) => prev.filter((producto) => producto.id !== id));
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Error al eliminar producto");
       }
-    );
+    } catch (error) {
+      console.error("Error al eliminar producto:", error);
+      toast.error("Error al eliminar producto");
+    }
   };
 
-  // CARGANDO LOADER DE PRODUCTOS
-  if (loading)
-    return (
-      <div className="fixed inset-0 z-50 flex justify-center items-center h-full">
-        <Loader2 className="mr-2 h-12 w-12 animate-spin" />
-        <p>Cargando Productos...</p>
-      </div>
-    );
+  const abrirModalEdicion = (producto: Producto) => {
+    setProductoSeleccionado(producto);
+    setModalOpen(true);
+  };
+
+  const formatearFecha = (fecha: string) => {
+    return new Date(fecha).toLocaleDateString("es-PE", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
 
   return (
     <div className="container mx-auto p-4 rounded-lg shadow-lg bg-white dark:bg-slate-900 dark:shadow-slate-700">
-      <h1 className="text-3xl font-bold mb-4">Productos</h1>
+      <div className="flex flex-col md:flex-row md:justify-between items-center mb-4">
+        <h1 className="text-3xl font-bold mb-4">Productos</h1>
 
-      {/* BOTON DIALOGO PARA CREAR UN NUEVO PRODUCTO */}
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button className="mb-4">Agregar Producto</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Crear Nuevo Producto</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4">
-            <Input
-              placeholder="Nombre"
-              value={nuevoProducto.nombre || ""}
-              onChange={(e) =>
-                setNuevoProducto({
-                  ...nuevoProducto,
-                  nombre: e.target.value,
-                })
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+          <DialogTrigger asChild>
+            <Button
+              onClick={() => {
+                setProductoSeleccionado(null);
+                setModalOpen(true);
+              }}
+            >
+              <Plus className="mr-2 h-4 w-4" /> Nuevo Producto
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {productoSeleccionado ? "Editar Producto" : "Nuevo Producto"}
+              </DialogTitle>
+            </DialogHeader>
+            <form
+              onSubmit={
+                productoSeleccionado
+                  ? handleEditarProducto
+                  : handleCrearProducto
               }
-            />
-            <Input
-              type="number"
-              placeholder="Cantidad"
-              value={nuevoProducto.cantidad || ""}
-              onChange={(e) =>
-                setNuevoProducto({
-                  ...nuevoProducto,
-                  cantidad: Number(e.target.value),
-                })
-              }
-            />
-            <Input
-              placeholder="Unidad"
-              value={nuevoProducto.unidad || ""}
-              onChange={(e) =>
-                setNuevoProducto({
-                  ...nuevoProducto,
-                  unidad: e.target.value,
-                })
-              }
-            />
-            <DialogClose asChild>
-              <Button onClick={handleCrearProducto}>Crear Producto</Button>
-            </DialogClose>
-          </div>
-        </DialogContent>
-      </Dialog>
+              className="grid gap-4"
+            >
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Input
+                  name="nombre"
+                  placeholder="Nombre"
+                  defaultValue={productoSeleccionado?.nombre || ""}
+                  className="col-span-4"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Input
+                  type="number"
+                  name="cantidad"
+                  placeholder="Cantidad"
+                  defaultValue={productoSeleccionado?.cantidad || ""}
+                  className="col-span-4"
+                  required
+                  min="0"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Input
+                  name="unidad"
+                  placeholder="Unidad"
+                  defaultValue={productoSeleccionado?.unidad || ""}
+                  className="col-span-4"
+                  required
+                />
+              </div>
+              <div className="flex justify-end">
+                <Button type="submit" className="w-full">
+                  {productoSeleccionado ? "Actualizar" : "Crear Producto"}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
 
-      {/* TABLA EN PANTALLAS GRANDE DESKTOP */}
-      <div className="hidden border md:block">
-        <Table>
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="mr-2 h-12 w-12 animate-spin" />
+          <p>Cargando Productos...</p>
+        </div>
+      ) : (
+        <Table className="border">
           <TableHeader>
             <TableRow className="bg-slate-100">
               <TableHead>ID</TableHead>
@@ -243,7 +254,7 @@ export default function ProductosPage() {
               <TableHead>Stock</TableHead>
               <TableHead>Unidad</TableHead>
               <TableHead>Última Actualización</TableHead>
-              <TableHead>Acciones</TableHead>
+              <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -254,167 +265,56 @@ export default function ProductosPage() {
                 <TableCell>{producto.cantidad}</TableCell>
                 <TableCell>{producto.unidad}</TableCell>
                 <TableCell>
-                  {new Date(producto.ultimaActualizacion).toLocaleDateString()}
+                  {formatearFecha(producto.ultimaActualizacion)}
                 </TableCell>
-                <TableCell className="flex items-center gap-2">
-                  {/* BOTON DIALOGO PARA EDITAR UN PRODUCTO */}
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        onClick={() => setEditProducto(producto)}
-                      >
-                        Editar
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Editar Producto</DialogTitle>
-                      </DialogHeader>
-                      {editProducto && (
-                        <div className="grid gap-4">
-                          <Input
-                            placeholder="Nombre"
-                            value={editProducto.nombre || ""}
-                            onChange={(e) =>
-                              setEditProducto({
-                                ...editProducto,
-                                nombre: e.target.value,
-                              })
-                            }
-                          />
-                          <Input
-                            type="number"
-                            placeholder="Cantidad"
-                            value={editProducto.cantidad || ""}
-                            onChange={(e) =>
-                              setEditProducto({
-                                ...editProducto,
-                                cantidad: Number(e.target.value),
-                              })
-                            }
-                          />
-                          <Input
-                            placeholder="Unidad"
-                            value={editProducto.unidad || ""}
-                            onChange={(e) =>
-                              setEditProducto({
-                                ...editProducto,
-                                unidad: e.target.value,
-                              })
-                            }
-                          />
-                          <DialogClose asChild>
-                            <Button onClick={handleEditarProducto}>
-                              Guardar Cambios
-                            </Button>
-                          </DialogClose>
-                        </div>
-                      )}
-                    </DialogContent>
-                  </Dialog>
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleDelete(producto.id)}
-                    className="ml-2"
-                  >
-                    Eliminar
-                  </Button>
+                <TableCell className="text-right">
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => abrirModalEdicion(producto)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="icon">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            ¿Estás seguro de eliminar este producto?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Esta acción no se puede deshacer. Se eliminará
+                            permanentemente el registro del producto.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleEliminarProducto(producto.id)}
+                          >
+                            Eliminar
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </div>
+      )}
 
-      {/* TARJETAS PARA PANTALLAS MOBILES */}
-      <div className="md:hidden grid gap-4">
-        {productos.map((producto) => (
-          <div
-            key={producto.id}
-            className="p-4 border rounded-lg bg-white shadow dark:bg-slate-800"
-          >
-            <h2 className="text-lg font-semibold mb-2">{producto.nombre}</h2>
-            <p>
-              <strong>ID:</strong> {producto.id}
-            </p>
-            <p>
-              <strong>Stock:</strong> {producto.cantidad}
-            </p>
-            <p>
-              <strong>Unidad:</strong> {producto.unidad}
-            </p>
-            <p>
-              <strong>Última Actualización:</strong>{" "}
-              {new Date(producto.ultimaActualizacion).toLocaleDateString()}
-            </p>
-            <div className="mt-2 flex items-center gap-2">
-              {/* BOTON DIALOGO PARA EDITAR UN PRODUCTO */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    onClick={() => setEditProducto(producto)}
-                  >
-                    Editar
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Editar Producto</DialogTitle>
-                  </DialogHeader>
-                  {editProducto && (
-                    <div className="grid gap-4">
-                      <Input
-                        placeholder="Nombre"
-                        value={editProducto.nombre || ""}
-                        onChange={(e) =>
-                          setEditProducto({
-                            ...editProducto,
-                            nombre: e.target.value,
-                          })
-                        }
-                      />
-                      <Input
-                        type="number"
-                        placeholder="Cantidad"
-                        value={editProducto.cantidad || ""}
-                        onChange={(e) =>
-                          setEditProducto({
-                            ...editProducto,
-                            cantidad: Number(e.target.value),
-                          })
-                        }
-                      />
-                      <Input
-                        placeholder="Unidad"
-                        value={editProducto.unidad || ""}
-                        onChange={(e) =>
-                          setEditProducto({
-                            ...editProducto,
-                            unidad: e.target.value,
-                          })
-                        }
-                      />
-                      <DialogClose asChild>
-                        <Button onClick={handleEditarProducto}>
-                          Guardar Cambios
-                        </Button>
-                      </DialogClose>
-                    </div>
-                  )}
-                </DialogContent>
-              </Dialog>
-              <Button
-                variant="destructive"
-                onClick={() => handleDelete(producto.id)}
-              >
-                Eliminar
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
+      {!loading && productos.length === 0 && (
+        <div className="text-center py-8 text-gray-500">
+          No hay productos registrados
+        </div>
+      )}
     </div>
   );
 }

@@ -56,22 +56,22 @@ export default function Sidebar() {
             href="/productos"
             className="text-gray-700 hover:text-gray-900 flex items-center space-x-2 dark:text-white dark:hover:text-gray-400"
           >
-            <span>🛒</span>
+            <span>📦</span>
             <span>Productos</span>
           </Link>
           <Link
             href="/pedidos"
             className="text-gray-700 hover:text-gray-900 flex items-center space-x-2 dark:text-white dark:hover:text-gray-400"
           >
-            <span>📦</span>
-            <span>Pedidos</span>
+            <span>👨🏼‍🤝‍👨🏻</span>
+            <span>Ventas</span>
           </Link>
           <Link
-            href="/clientes"
+            href="/compras"
             className="text-gray-700 hover:text-gray-900 flex items-center space-x-2 dark:text-white dark:hover:text-gray-400"
           >
-            <span>👨🏼‍🤝‍👨🏻</span>
-            <span>Clientes</span>
+            <span>🛒</span>
+            <span>Compras</span>
           </Link>
           <Link
             href="/reportes/ventas"
@@ -178,7 +178,7 @@ export default function Sidebar() {
                     href="/productos"
                     className="text-gray-700 hover:text-gray-900 block dark:text-white dark:hover:text-gray-400"
                   >
-                    <span className="mr-1">🛒</span>
+                    <span className="mr-1">📦</span>
                     Productos
                   </Link>
                 </SheetClose>
@@ -187,17 +187,17 @@ export default function Sidebar() {
                     href="/pedidos"
                     className="text-gray-700 hover:text-gray-900 block dark:text-white dark:hover:text-gray-400"
                   >
-                    <span className="mr-1">📦</span>
-                    Pedidos
+                    <span className="mr-1">👨🏼‍🤝‍👨🏻</span>
+                    Ventas
                   </Link>
                 </SheetClose>
                 <SheetClose asChild>
                   <Link
-                    href="/clientes"
+                    href="/compras"
                     className="text-gray-700 hover:text-gray-900 block dark:text-white dark:hover:text-gray-400"
                   >
-                    <span className="mr-1">👨🏼‍🤝‍👨🏻</span>
-                    Clientes
+                    <span className="mr-1">🛒</span>
+                    Compras
                   </Link>
                 </SheetClose>
                 <SheetClose asChild>

@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
           precioUnitario: Number(precioUnitario),
           precioTotal,
           estado,
+          medioDePago: "",
         },
       });
 
