@@ -188,7 +188,7 @@ export default function Sidebar() {
                     className="text-gray-700 hover:text-gray-900 block dark:text-white dark:hover:text-gray-400"
                   >
                     <span className="mr-1">👨🏼‍🤝‍👨🏻</span>
-                    Ventas
+                    Pedidos
                   </Link>
                 </SheetClose>
                 <SheetClose asChild>

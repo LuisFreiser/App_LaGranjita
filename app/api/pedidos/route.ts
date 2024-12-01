@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     // Calcular precio total
     const precioTotal = Number(cantidad) * Number(precioUnitario);
 
-    // Crear pedido y actualizar stock en una transacción
+    // Crear pedido y actualizar stock del producto
     const resultado = await prisma.$transaction(async (prisma) => {
       // Crear pedido
       const nuevoPedido = await prisma.pedido.create({
@@ -53,13 +53,13 @@ export async function POST(request: NextRequest) {
       });
 
       // Actualizar stock del producto
-      await prisma.producto.update({
-        where: { id: productoExistente.id },
-        data: {
-          cantidad: productoExistente.cantidad - cantidad,
-          ultimaActualizacion: new Date(),
-        },
-      });
+      // await prisma.producto.update({
+      //   where: { id: productoExistente.id },
+      //   data: {
+      //     cantidad: productoExistente.cantidad - cantidad,
+      //     ultimaActualizacion: new Date(),
+      //   },
+      // });
 
       return nuevoPedido;
     });
@@ -153,25 +153,25 @@ export async function DELETE(request: NextRequest) {
       }
 
       // Solo actualizar stock si el pedido está pendiente
-      if (pedido.estado === "Pendiente") {
-        // Encontrar el producto
-        const producto = await prisma.producto.findFirst({
-          where: { nombre: pedido.producto },
-        });
+      // if (pedido.estado === "Pendiente") {
+      //   // Encontrar el producto
+      //   const producto = await prisma.producto.findFirst({
+      //     where: { nombre: pedido.producto },
+      //   });
 
-        if (!producto) {
-          throw new Error(`Producto "${pedido.producto}" no encontrado`);
-        }
+      //   if (!producto) {
+      //     throw new Error(`Producto "${pedido.producto}" no encontrado`);
+      //   }
 
-        // Actualizar el stock del producto
-        await prisma.producto.update({
-          where: { id: producto.id },
-          data: {
-            cantidad: producto.cantidad + pedido.cantidad,
-            ultimaActualizacion: new Date(),
-          },
-        });
-      }
+      //   // Actualizar el stock del producto
+      //   await prisma.producto.update({
+      //     where: { id: producto.id },
+      //     data: {
+      //       cantidad: producto.cantidad + pedido.cantidad,
+      //       ultimaActualizacion: new Date(),
+      //     },
+      //   });
+      // }
 
       // Eliminar el pedido
       return prisma.pedido.delete({
