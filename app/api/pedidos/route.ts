@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
 //POST PARA CREAR UN NUEVO PEDIDO
-
 export async function POST(request: NextRequest) {
   try {
     const {
@@ -78,7 +77,15 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const pedidos = await prisma.pedido.findMany();
+    // Agregando filtros y limites de pedidos
+    const pedidos = await prisma.pedido.findMany({
+      take: 10, // Limita a 10 resultados
+      skip: 0, // Omite los primeros 0 resultados
+      orderBy: {
+        createdAt: "desc", // Ordena por la fecha de creación de más reciente a más antigua
+      },
+    });
+
     return NextResponse.json(pedidos);
   } catch (error) {
     console.error(error);

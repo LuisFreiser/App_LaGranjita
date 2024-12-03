@@ -49,6 +49,7 @@ export default function ReporteVentas() {
     ],
   });
 
+  // FUNCION PARA GENERAR EL REPORTE DE VENTAS
   const generarReporte = async () => {
     // Tu código de generación de reporte existente
     const response = await fetch("/api/reportes/ventas", {
@@ -62,7 +63,11 @@ export default function ReporteVentas() {
 
     const ventasPorDia = data.ventas.reduce(
       (acc: Record<string, number>, venta: Venta) => {
-        const fecha = new Date(venta.createdAt).toLocaleDateString();
+        const fecha = new Date(venta.createdAt).toLocaleDateString("es-PE", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
         acc[fecha] = (acc[fecha] || 0) + venta.precioTotal;
         return acc;
       },
@@ -115,7 +120,7 @@ export default function ReporteVentas() {
                 className="w-full sm:w-auto justify-start text-left"
               >
                 {fechaInicio ? (
-                  format(fechaInicio, "yyyy-MM-dd")
+                  format(fechaInicio, "dd-MM-yyyy")
                 ) : (
                   <span className="text-gray-400">Fecha de Inicio</span>
                 )}
@@ -141,7 +146,7 @@ export default function ReporteVentas() {
                 className="w-full sm:w-auto justify-start text-left"
               >
                 {fechaFin ? (
-                  format(fechaFin, "yyyy-MM-dd")
+                  format(fechaFin, "dd-MM-yyyy")
                 ) : (
                   <span className="text-gray-400">Fecha de Fin</span>
                 )}
@@ -183,7 +188,12 @@ export default function ReporteVentas() {
                     <TableCell>{venta.cliente}</TableCell>
                     <TableCell>{venta.producto}</TableCell>
                     <TableCell>
-                      {new Date(venta.createdAt).toLocaleDateString()}
+                      {/* Formateando la fecha en español Perú 1/12/2024 */}
+                      {new Date(venta.createdAt).toLocaleDateString("es-PE", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })}
                     </TableCell>
                     <TableCell>{venta.cantidad}</TableCell>
                     <TableCell>S/. {venta.precioTotal.toFixed(2)}</TableCell>

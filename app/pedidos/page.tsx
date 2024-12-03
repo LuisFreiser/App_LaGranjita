@@ -120,29 +120,6 @@ export default function PedidosPage() {
       });
 
       if (response.ok) {
-        // const pedidoCreado = await response.json();
-
-        // Actualizar stock del producto
-        // if (productoSeleccionado) {
-        //   const actualizarProductoResponse = await fetch(
-        //     `/api/productos/${productoSeleccionado.id}`,
-        //     {
-        //       method: "PUT",
-        //       headers: { "Content-Type": "application/json" },
-        //       body: JSON.stringify({
-        //         nombre: productoSeleccionado.nombre,
-        //         cantidad:
-        //           (productoSeleccionado.cantidad || 0) - nuevoPedido.cantidad,
-        //         unidad: productoSeleccionado.unidad,
-        //       }),
-        //     }
-        //   );
-
-        //   if (!actualizarProductoResponse.ok) {
-        //     toast.error("Error al actualizar el stock del producto");
-        //   }
-        // }
-
         toast.success("Pedido creado exitosamente");
         fetchPedidos();
         fetchProductos();
@@ -185,31 +162,6 @@ export default function PedidosPage() {
       });
 
       if (response.ok) {
-        // Calcular la diferencia de cantidad
-        // const diferenciasCantidad =
-        //   pedidoActualizado.cantidad - pedidoSeleccionado.cantidad;
-
-        // Actualizar stock del producto
-        // if (productoSeleccionado) {
-        //   const actualizarProductoResponse = await fetch(
-        //     `/api/productos/${productoSeleccionado.id}`,
-        //     {
-        //       method: "PUT",
-        //       headers: { "Content-Type": "application/json" },
-        //       body: JSON.stringify({
-        //         nombre: productoSeleccionado.nombre,
-        //         cantidad:
-        //           (productoSeleccionado.cantidad || 0) - diferenciasCantidad,
-        //         unidad: productoSeleccionado.unidad,
-        //       }),
-        //     }
-        //   );
-
-        //   if (!actualizarProductoResponse.ok) {
-        //     toast.error("Error al actualizar el stock del producto");
-        //   }
-        // }
-
         toast.success("Pedido actualizado exitosamente");
         fetchPedidos();
         fetchProductos();
@@ -234,35 +186,6 @@ export default function PedidosPage() {
       });
 
       if (response.ok) {
-        // const pedidoEliminado = await response.json();
-
-        // // Si el pedido fue eliminado, devolver el stock solo si esta pendiente
-        // if (pedidoEliminado) {
-        //   const productoAfectado = productos.find(
-        //     (p) => p.nombre === pedidoEliminado.producto
-        //   );
-
-        //   if (productoAfectado) {
-        //     const actualizarProductoResponse = await fetch(
-        //       `/api/productos/${productoAfectado.id}`,
-        //       {
-        //         method: "PUT",
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify({
-        //           nombre: productoAfectado.nombre,
-        //           cantidad:
-        //             (productoAfectado.cantidad || 0) + pedidoEliminado.cantidad,
-        //           unidad: productoAfectado.unidad,
-        //         }),
-        //       }
-        //     );
-
-        //     if (!actualizarProductoResponse.ok) {
-        //       toast.error("Error al devolver el stock del producto");
-        //     }
-        //   }
-        // }
-
         toast.success("Pedido eliminado exitosamente");
         fetchPedidos();
         fetchProductos();

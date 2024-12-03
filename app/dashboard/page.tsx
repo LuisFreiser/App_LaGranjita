@@ -79,7 +79,7 @@ export default function Dashboard() {
       }, 0);
   };
 
-  // FUNCION PARA OBTENER LOS PEDIDOS
+  // FUNCION PARA OBTENER LOS PEDIDOS DE LA GET API
   const fetchPedidos = async () => {
     try {
       const response = await fetch("/api/pedidos");
@@ -144,8 +144,13 @@ export default function Dashboard() {
     }
   };
 
+  // const irAPagina = (pagina: number) => {
+  //   setPaginaActual(pagina);
+  // };
   const irAPagina = (pagina: number) => {
-    setPaginaActual(pagina);
+    if (pagina >= 1 && pagina <= totalPaginas) {
+      setPaginaActual(pagina);
+    }
   };
 
   const calcularStockTotal = () => {
@@ -153,31 +158,6 @@ export default function Dashboard() {
   };
 
   // FUNCION PARA ENTREGAR, CANCELAR PEDIDOS Y REDUCIR STOCK DE PRODUCTOS
-
-  // const handleEntregarPedido = async (
-  //   pedidoId: number,
-  //   medioDePago: string
-  // ) => {
-  //   try {
-  //     const response = await fetch(`/api/pedidos/${pedidoId}`, {
-  //       method: "PATCH",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ estado: "Entregado", medioDePago: medioDePago }),
-  //     });
-
-  //     if (response.ok) {
-  //       toast.success("Pedido entregado exitosamente");
-  //       fetchPedidos();
-  //     } else {
-  //       const errorData = await response.json();
-  //       toast.error(errorData.error || "Error al entregar el pedido");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error al entregar el pedido:", error);
-  //     toast.error("Error al entregar el pedido");
-  //   }
-  // };
-
   const handleEntregarPedido = async (
     pedidoId: number,
     medioDePago: string
@@ -432,7 +412,7 @@ export default function Dashboard() {
             </Table>
 
             {/* COMPONENTE DE PAGINACIÓN */}
-            {totalPaginas > 1 && (
+            {totalPaginas >= 1 && (
               <Pagination className="mt-4">
                 <PaginationContent>
                   <PaginationItem>
