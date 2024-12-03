@@ -1,5 +1,5 @@
-export const AjustesPage = () => {
-  return <div>AjustesPage</div>;
-};
+import React from "react";
 
-export default AjustesPage;
+export default function AjustesPage() {
+  return <div>AjustesPage</div>;
+}
