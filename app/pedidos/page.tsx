@@ -39,6 +39,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 type Pedido = {
   id: number;
@@ -59,6 +67,10 @@ export default function PedidosPage() {
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loadingProductos, setLoadingProductos] = useState(true);
+
+  // Estado de Paginación
+  const [paginaActual, setPaginaActual] = useState(1);
+  const pedidosPorPagina = 5; // Cantidad de pedidos por página
 
   //USANDO FETCH PARA LLAMAR A LA API Y OBTENER LOS PEDIDOS
   const fetchPedidos = async () => {
@@ -203,12 +215,48 @@ export default function PedidosPage() {
     setPedidoSeleccionado(pedido);
     setModalOpen(true);
   };
+  //CONSTANTE QUE ALMACENA Y FILTRA LOS PRIMEROS 10 PEDIDOS
+  const primeras10Filas = pedidos.slice(0, 10);
 
+  // FUNCIONES DE PAGINACIÓN DE DASHBOARD PEDIDOS
+
+  // Calcular total de pedidos para la Páginacion
+  const pedidosPaginados = pedidos.slice(
+    (paginaActual - 1) * pedidosPorPagina,
+    paginaActual * pedidosPorPagina
+  );
+
+  // Calcular total de páginas
+  const totalPaginas = Math.ceil(pedidos.length / pedidosPorPagina);
+
+  // Funciones de Limk de Paginación
+  const paginaSiguiente = () => {
+    if (paginaActual < totalPaginas) {
+      setPaginaActual(paginaActual + 1);
+    }
+  };
+
+  const paginaAnterior = () => {
+    if (paginaActual > 1) {
+      setPaginaActual(paginaActual - 1);
+    }
+  };
+
+  const irAPagina = (pagina: number) => {
+    if (pagina >= 1 && pagina <= totalPaginas) {
+      setPaginaActual(pagina);
+    }
+  };
+
+  {
+    /* TABLA LISTA DE PEDIDOS */
+  }
   return (
     <div className="container mx-auto p-4 rounded-lg shadow-lg bg-white dark:bg-slate-900 dark:shadow-slate-700">
       <div className="flex flex-col md:flex-row md:justify-between items-center mb-4">
         <h1 className="text-3xl font-bold mb-4">Pedidos</h1>
 
+        {/* BOTON DIALOGO DE NUEVO PEDIDO */}
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
           <DialogTrigger asChild>
             <Button
@@ -325,6 +373,7 @@ export default function PedidosPage() {
         </Dialog>
       </div>
 
+      {/* CARGANDO LISTA DE PEDIDOS */}
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <Loader2 className="mr-2 h-12 w-12 animate-spin" />
@@ -343,7 +392,7 @@ export default function PedidosPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {pedidos.map((pedido) => (
+            {pedidosPaginados.map((pedido) => (
               <TableRow key={pedido.id}>
                 <TableCell>{pedido.cliente}</TableCell>
                 <TableCell>{pedido.producto}</TableCell>
@@ -393,9 +442,54 @@ export default function PedidosPage() {
         </Table>
       )}
 
-      {/* CARDS EN MÓVILES */}
+      {/* COMPONENTE DE PAGINACIÓN */}
+      <div className="hidden md:block">
+        {totalPaginas >= 1 && (
+          <Pagination className="mt-4">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={paginaAnterior}
+                  className={
+                    paginaActual === 1
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+
+              {/* GENERAR NUMERO DE PAGINAS */}
+              {[...Array(totalPaginas)].map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink
+                    onClick={() => irAPagina(index + 1)}
+                    isActive={paginaActual === index + 1}
+                    className="cursor-pointer"
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={paginaSiguiente}
+                  className={
+                    paginaActual === totalPaginas
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
+      </div>
+
+      {/* CARDS EN MODO MÓVILES */}
+
       <div className="md:hidden space-y-4">
-        {pedidos.map((pedido) => (
+        {primeras10Filas.map((pedido) => (
           <div
             key={pedido.id}
             className="bg-white dark:bg-slate-800 border rounded-lg p-4 shadow-sm"
@@ -464,7 +558,7 @@ export default function PedidosPage() {
         ))}
       </div>
 
-      {/* ESTADO VACÍO */}
+      {/* ESTADO TABLA PEDIDOS VACÍO */}
       {!loading && pedidos.length === 0 && (
         <div className="text-center py-8 text-gray-500">
           No hay pedidos registrados

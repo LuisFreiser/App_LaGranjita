@@ -58,7 +58,7 @@ export default function Dashboard() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Estados de Paginación
+  // Estado de Paginación
   const [paginaActual, setPaginaActual] = useState(1);
   const pedidosPorPagina = 4; // Cantidad de pedidos por página
 
@@ -117,12 +117,19 @@ export default function Dashboard() {
     fetchProductos();
   }, []);
 
+  // Calculando el stock total
+  const calcularStockTotal = () => {
+    return productos.reduce((total, producto) => total + producto.cantidad, 0);
+  };
+
   // Filtrar pedidos pendientes
   const pedidosPendientes = pedidos.filter(
     (pedido) => pedido.estado === "Pendiente"
   );
 
-  // Calcular pedidos para la página actual
+  // FUNCIONES DE PAGINACIÓN DE DASHBOARD PEDIDOS
+
+  // Calcular pedidos para Página actual
   const pedidosPaginados = pedidosPendientes.slice(
     (paginaActual - 1) * pedidosPorPagina,
     paginaActual * pedidosPorPagina
@@ -131,7 +138,7 @@ export default function Dashboard() {
   // Calcular total de páginas
   const totalPaginas = Math.ceil(pedidosPendientes.length / pedidosPorPagina);
 
-  // Funciones de paginación
+  // Funciones de Limk de Paginación
   const paginaSiguiente = () => {
     if (paginaActual < totalPaginas) {
       setPaginaActual(paginaActual + 1);
@@ -144,17 +151,10 @@ export default function Dashboard() {
     }
   };
 
-  // const irAPagina = (pagina: number) => {
-  //   setPaginaActual(pagina);
-  // };
   const irAPagina = (pagina: number) => {
     if (pagina >= 1 && pagina <= totalPaginas) {
       setPaginaActual(pagina);
     }
-  };
-
-  const calcularStockTotal = () => {
-    return productos.reduce((total, producto) => total + producto.cantidad, 0);
   };
 
   // FUNCION PARA ENTREGAR, CANCELAR PEDIDOS Y REDUCIR STOCK DE PRODUCTOS

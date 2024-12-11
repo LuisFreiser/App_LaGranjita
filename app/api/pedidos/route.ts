@@ -51,15 +51,6 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // Actualizar stock del producto
-      // await prisma.producto.update({
-      //   where: { id: productoExistente.id },
-      //   data: {
-      //     cantidad: productoExistente.cantidad - cantidad,
-      //     ultimaActualizacion: new Date(),
-      //   },
-      // });
-
       return nuevoPedido;
     });
 
@@ -79,7 +70,7 @@ export async function GET() {
   try {
     // Agregando filtros y limites de pedidos
     const pedidos = await prisma.pedido.findMany({
-      take: 10, // Limita a 10 resultados
+      // take: 10, // Limita a 10 resultados
       skip: 0, // Omite los primeros 0 resultados
       orderBy: {
         createdAt: "desc", // Ordena por la fecha de creación de más reciente a más antigua
